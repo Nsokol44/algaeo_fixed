@@ -7,23 +7,41 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\SubscriberController;
 use Illuminate\Support\Facades\Route;
 
-// Public Pages
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+// Public marketing pages
+//
+Route::view('/', 'pages.home')->name('home');
+Route::view('/about', 'pages.about')->name('about');
+Route::view('/contact', 'pages.contact')->name('contact');
 
-Route::get('/about', function () {
-    return view('about');
-})->name('about');
+//
+// Blog (News & Articles)
+//
+Route::get('/blog', [PostController::class, 'index'])->name('blog.index');
+Route::get('/blog/{post:slug}', [PostController::class, 'show'])->name('blog.show');
 
-Route::get('/resources', function () {
-    return view('resources');
-})->name('resources');
+//
+// Shop
+//
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/account', function () {
+    return view('pages.shop.account');
+})->name('shop.account');
 
-Route::get('/contact', [ContactController::class, 'show'])->name('contact');
-Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+Route::get('/shop/checkout', function () {
+    return view('pages.shop.checkout');
+})->name('shop.checkout');
 
-Route::post('/subscribe', [SubscriberController::class, 'store'])->name('subscribe.store');
+Route::get('/shop/cart', function () {
+    return view('pages.shop.cart');
+})->name('shop.cart');
+
+
+//
+// Internal Tools (optional)
+//
+Route::view('/tools', 'tools.index')->name('tools.index');
+
+
 
 // Laravel Breeze Authentication Routes
 require __DIR__.'/auth.php';

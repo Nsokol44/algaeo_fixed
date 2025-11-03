@@ -11,6 +11,12 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                // remember to ask Nick for the exact hex codes and logos
+                primary: "#5c8a83",
+                secondary: "#5ccc4b",
+                accent: "#306d64"
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
