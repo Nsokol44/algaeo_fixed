@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('microbes', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->string('genus');
             $table->string('species');
             $table->text('function_summary')->nullable();
