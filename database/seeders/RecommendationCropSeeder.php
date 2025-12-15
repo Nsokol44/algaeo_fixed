@@ -32,27 +32,33 @@ class RecommendationCropSeeder extends Seeder
             $q->where('name', 'Algaeo Microbe Consortia');
         })->first();
 
-        // Make sure these names match your CropSeeder
-        $tomato       = Crop::where('name', 'Tomato')->first();
-        $leafyGreens  = Crop::where('name', 'Leafy Greens')->first();
-        $anyCrop      = Crop::where('name', 'Any crop')->first(); // optional, if you created one
+
+        $tomato  = Crop::where('name', 'Tomato')->first();
+        $lettuce = Crop::where('name', 'Lettuce')->first();
+        $spinach = Crop::where('name', 'Spinach')->first();
+        $kale    = Crop::where('name', 'Kale')->first();
+        $anyCrop = Crop::where('name', 'General (Any Crop)')->first();
 
         if ($waterSaver && $tomato) {
             $waterSaver->crops()->syncWithoutDetaching([$tomato->id]);
         }
 
-        if ($nitrogenPlus && $leafyGreens) {
-            $nitrogenPlus->crops()->syncWithoutDetaching([$leafyGreens->id]);
+        // Nitrogen+ -> leafy green crops (lettuce, spinach, kale)
+        if ($nitrogenPlus) {
+            $ids = collect([$lettuce, $spinach, $kale])
+                ->filter()          // drop nulls just in case
+                ->pluck('id')
+                ->all();
+
+            if (!empty($ids)) {
+                $nitrogenPlus->crops()->syncWithoutDetaching($ids);
+            }
         }
 
-        // RootGuard applies broadly to veggies / susceptible crops
-        // if "Any crop" or "Vegetable crops" entry, use that here:
+        // RootGuard → broadly for vegetable crops -> use the "General (Any Crop)" 
         if ($rootGuard && $anyCrop) {
             $rootGuard->crops()->syncWithoutDetaching([$anyCrop->id]);
         }
-
-        // AquaSym is more about system type (hydroponic) than crop,
-        // so fine to leave crops empty for it
 
         // consortium -> default
     }

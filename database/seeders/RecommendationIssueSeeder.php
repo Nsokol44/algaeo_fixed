@@ -30,11 +30,9 @@ class RecommendationIssueSeeder extends Seeder
             $q->where('name', 'Algaeo Microbe Consortia');
         })->first();
 
-        // IMPORTANT: make these match your IssueSeeder names exactly
         $drought      = Issue::where('name', 'Drought stress')->first();
-        $yellowLeaves = Issue::where('name', 'Yellow leaves / N deficiency')->first();
-        $disease      = Issue::where('name', 'Disease pressure')->first();
-        $hydroRefresh = Issue::where('name', 'Hydroponic system refresh')->first();
+        $yellowLeaves = Issue::where('name', 'Yellow Leaves (Chlorosis)')->first();
+        $disease      = Issue::where('name', 'Disease Pressure')->first();
 
         if ($waterSaver && $drought) {
             $waterSaver->issues()->syncWithoutDetaching([$drought->id]);
