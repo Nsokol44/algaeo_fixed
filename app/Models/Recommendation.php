@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Recommendation extends Model
 {
     use HasFactory;
-    protected $fillable = ['product_id', 'rank_score', 'notes'];
+    protected $fillable = ['product_id', 'rank_score', 'notes', 'application_method', 'application_frequency', 'trial_guidance'];
     // each recommendation belongs to one product 
     public function product() {
         return $this->belongsTo(Product::class, 'product_id'); 

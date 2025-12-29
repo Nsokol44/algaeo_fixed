@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Recommendation;
+use App\Models\Issue;
 
 class RecommendationIssueSeeder extends Seeder
 {
@@ -33,6 +35,7 @@ class RecommendationIssueSeeder extends Seeder
         $drought      = Issue::where('name', 'Drought stress')->first();
         $yellowLeaves = Issue::where('name', 'Yellow Leaves (Chlorosis)')->first();
         $disease      = Issue::where('name', 'Disease Pressure')->first();
+        $hydroRefresh = Issue::where('name', 'Hydroponic System Refresh')->first();
 
         if ($waterSaver && $drought) {
             $waterSaver->issues()->syncWithoutDetaching([$drought->id]);

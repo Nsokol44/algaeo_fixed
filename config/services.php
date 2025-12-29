@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'algaeo' => [
+        'api_key' => env('ALGAEO_API_KEY'),
+    ],
+
 ];

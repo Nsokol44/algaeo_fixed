@@ -8,5 +8,5 @@ Route::get('/health', function () {
     return ['status' => 'ok'];
 });
 
-// main recommendation endpoint
-Route::get('/recommend', [RecommendationController::class, 'index']);
+// v1 recommendation endpoint (POST + versioned path)
+Route::post('/v1/recommendations', [RecommendationController::class, 'index']);

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Product extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'category', 'description']; 
+    protected $fillable = ['name', 'slug', 'category', 'description', 'product_rank']; 
     // a product has many microbes 
     public function microbes() {
         return $this->belongsToMany(Microbe::class, 'product_microbe', 'product_id', 'microbe_id'); 

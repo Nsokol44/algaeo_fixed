@@ -10,7 +10,7 @@ class Microbe extends Model
 {
     use HasFactory; 
     // to mass assign fields 
-    protected $fillable = ['name', 'genus', 'species', 'function_summary', 'benefit_tags'];
+    protected $fillable = ['name', 'genus', 'species', 'function_summary', 'benefit_tags', 'common_name'];
     // a microbe belongs to many products via pivot 
     public function products() {
         return $this->belongsToMany(Product::class, 'product_microbe', 'microbe_id', 'product_id'); 
