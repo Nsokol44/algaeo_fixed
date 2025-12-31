@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Recommendation;
+use App\Models\Crop;
 
 class RecommendationController extends Controller
 {
@@ -67,18 +68,47 @@ class RecommendationController extends Controller
             });
         }
         
-        // crop filter 
+        // crop filter with category/variety fallback
         if ($crop) {
             $query->where(function ($q) use ($crop) {
-                $q->whereHas('crops', function ($q2) use ($crop) {
-                    if (is_numeric($crop)) {
-                        $q2->where('crops.id', $crop); 
-                    } else {
-                        $q2->whereRaw('LOWER(crops.name) = ?', [strtolower($crop)]);
+                $cropIds = [];
+
+                if (is_numeric($crop)) {
+                    // if front end ever passes an id directly
+                    $cropIds[] = (int) $crop;
+                } else {
+                    // look up the crop row by name (case-insensitive)
+                    $cropModel = Crop::whereRaw('LOWER(name) = ?', [strtolower($crop)])->first();
+
+                    if ($cropModel) {
+                        // always include the specific crop row
+                        $cropIds[] = $cropModel->id;
+
+                        // if child with a parent category, include that parent
+                        if ($cropModel->parent_id) {
+                            $cropIds[] = $cropModel->parent_id;
+                        }
+
+                        // if category, include all its children
+                        if ($cropModel->is_category) {
+                            $childIds = $cropModel->children()->pluck('id')->all();
+                            $cropIds  = array_merge($cropIds, $childIds);
+                        }
                     }
-                })
-                // "any crop" recommendations
-                ->orWhereDoesntHave('crops');
+                }
+
+                $cropIds = array_values(array_unique($cropIds));
+
+                if (!empty($cropIds)) {
+                    $q->whereHas('crops', function ($q2) use ($cropIds) {
+                        $q2->whereIn('crops.id', $cropIds);
+                    })
+                    // plus recommendations that apply to any crop
+                    ->orWhereDoesntHave('crops');
+                } else {
+                    // else "any crop" recs
+                    $q->whereDoesntHave('crops');
+                }
             });
         }
 

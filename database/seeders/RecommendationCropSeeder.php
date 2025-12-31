@@ -2,16 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Recommendation;
 use App\Models\Crop;
 
 class RecommendationCropSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $waterSaver   = Recommendation::whereHas('product', function ($q) {
@@ -34,34 +30,54 @@ class RecommendationCropSeeder extends Seeder
             $q->where('name', 'Algaeo Microbe Consortia');
         })->first();
 
+        // is category == true 
+        $leafyGreens   = Crop::where('name', 'Leafy Greens')
+                             ->where('is_category', true)
+                             ->first();
 
-        $tomato  = Crop::where('name', 'Tomato')->first();
-        $lettuce = Crop::where('name', 'Lettuce')->first();
-        $spinach = Crop::where('name', 'Spinach')->first();
-        $kale    = Crop::where('name', 'Kale')->first();
-        $anyCrop = Crop::where('name', 'General (Any Crop)')->first();
+        $nightshades   = Crop::where('name', 'Nightshades')
+                             ->where('is_category', true)
+                             ->first();
 
-        if ($waterSaver && $tomato) {
-            $waterSaver->crops()->syncWithoutDetaching([$tomato->id]);
+        $rootCrops     = Crop::where('name', 'Root Crops')
+                             ->where('is_category', true)
+                             ->first();
+
+        $cerealsGrains = Crop::where('name', 'Cereals & Grains')
+                             ->where('is_category', true)
+                             ->first();
+
+        $anyCrop       = Crop::where('name', 'General (Any Crop)')
+                             ->where('is_category', false)
+                             ->first();
+
+        /*
+         * mappings:
+         * - WaterSaver - applies to any crop on clay + drought
+         * - Nitrogen+. - target Leafy Greens category (lettuce, spinach, kale, etc.)
+         * - RootGuard - target Root Crops category
+         * - AquaSym - example mapping to Cereals & Grains (or whichever demo category you prefer).
+         * - Consortium - stays global or can be tied to "General (Any Crop)".
+         */
+
+        if ($nitrogenPlus && $leafyGreens) {
+            $nitrogenPlus->crops()->syncWithoutDetaching([$leafyGreens->id]);
         }
 
-        // Nitrogen+ -> leafy green crops (lettuce, spinach, kale)
-        if ($nitrogenPlus) {
-            $ids = collect([$lettuce, $spinach, $kale])
-                ->filter()          // drop nulls just in case
-                ->pluck('id')
-                ->all();
-
-            if (!empty($ids)) {
-                $nitrogenPlus->crops()->syncWithoutDetaching($ids);
-            }
+        if ($rootGuard && $rootCrops) {
+            $rootGuard->crops()->syncWithoutDetaching([$rootCrops->id]);
         }
 
-        // RootGuard → broadly for vegetable crops -> use the "General (Any Crop)" 
-        if ($rootGuard && $anyCrop) {
-            $rootGuard->crops()->syncWithoutDetaching([$anyCrop->id]);
+        if ($aquaSym && $cerealsGrains) {
+            $aquaSym->crops()->syncWithoutDetaching([$cerealsGrains->id]);
         }
 
-        // consortium -> default
+        // optional: consortium -> explicit "any crop" row
+        if ($consortium) {
+            $consortium->crops()->detach();
+        }
+
+        // WaterSaver intentionally left without crop mapping
+        // so it’s keyed only to soil + issue.
     }
 }

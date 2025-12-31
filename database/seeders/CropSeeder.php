@@ -4,32 +4,75 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Crop;
 
 class CropSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $crops = [
-            ['name' => 'Lettuce'],
-            ['name' => 'Spinach'],
-            ['name' => 'Kale'],
-            ['name' => 'Tomato'],
-            ['name' => 'Cucumber'],
-            ['name' => 'Pepper'],
-            ['name' => 'Carrot'],
-            ['name' => 'Potato'],
-            ['name' => 'Beans'],
-            ['name' => 'Peas'],
-            ['name' => 'Basil'],
-            ['name' => 'Cilantro'],
-            ['name' => 'Wheat'],
-            ['name' => 'Corn'],
-            ['name' => 'General (Any Crop)'],
+        Crop::query()->delete();
+
+        // top level categories & the specific crops under each
+        $categories = [
+            'Cereals & Grains' => [
+                'Wheat',
+                'Corn',
+            ],
+            'Legumes' => [
+                'Beans',
+                'Peas',
+            ],
+            'Nightshades' => [
+                'Tomato',
+                'Pepper',
+                'Potato',
+            ],
+            'Brassicas & Leafy Greens' => [
+                'Kale',
+                'Lettuce',
+                'Spinach',
+            ],
+            'Cucurbits' => [
+                'Cucumber',
+            ],
+            'Root Crops' => [
+                'Carrot',
+            ],
+            'Herbs' => [
+                'Basil',
+                'Cilantro',
+            ],
+            'Other / Any Crop' => [
+                'General (Any Crop)',
+            ],
+            // extra top-level families mentioned in feedvack; no children yet is fine
+            'Biofuel & Industrial Crops' => [],
+            'Berries & Small Fruits' => [],
+            'Fruit, Nut, and Orchard Trees' => [],
         ];
 
-        \App\Models\Crop::insert($crops);
+        $categoryRows = [];
+
+        // create all category rows
+        foreach ($categories as $categoryName => $children) {
+            $categoryRows[$categoryName] = Crop::create([
+                'name' => $categoryName,
+                'is_category' => true,
+                'parent_id' => null,
+            ]);
+        }
+
+        // create children under each category
+        foreach ($categories as $categoryName => $children) {
+            $parent = $categoryRows[$categoryName];
+
+            foreach ($children as $childName) {
+                Crop::create([
+                    'name' => $childName,
+                    'is_category' => false,
+                    'parent_id' => $parent->id,
+                ]);
+            }
+        }
     }
 }
